@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Our Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 520px;
+            margin: auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .welcome-box {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f0f7ff;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1976d2;
+            border-radius: 6px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 22px;
+            background-color: #1976d2;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Welcome to <span th:text="${productName}">Our Product</span> 🎉</h2>
+
+    <p>Hello <strong th:text="${name}">User</strong>,</p>
+
+    <p>
+        We’re excited to have you on board!
+        Your account has been successfully created.
+    </p>
+
+    <div class="welcome-box">
+        You’re now ready to explore all the features of
+        <span th:text="${productName}">Our Product</span>.
+    </div>
+
+    <p>
+        Get started by logging into your account and setting things up your way.
+    </p>
+
+    <a class="btn" th:href="${loginUrl}">
+        Go to Dashboard
+    </a>
+
+    <p style="margin-top: 20px;">
+        If you have any questions, feel free to reach out to our support team.
+    </p>
+
+    <div class="footer">
+        <p>© 2026 <span th:text="${productName}">Our Product</span>. All rights reserved.</p>
+    </div>
+</div>
+
+</body>
+</html>

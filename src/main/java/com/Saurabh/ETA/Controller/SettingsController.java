@@ -1,8 +1,9 @@
 package com.Saurabh.ETA.Controller;
 
 import com.Saurabh.ETA.Entity.UserEntity;
+import com.Saurabh.ETA.Io.Settings.ResetPasswordSendOtpRequest;
+import com.Saurabh.ETA.Io.Settings.ResetPaswordRequest;
 import com.Saurabh.ETA.Io.Settings.UpdateRequest;
-import com.Saurabh.ETA.Repository.UsersRepository;
 import com.Saurabh.ETA.Service.SettingsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,21 @@ public class SettingsController {
             @CurrentSecurityContext(expression = "authentication.name") String email,
             @Valid @RequestBody UpdateRequest request){
         return settingsService.updateProfile(email, request);
+    }
+
+    @PostMapping("/send-reset-otp")
+    public ResponseEntity<String> sendResetOtp(@RequestParam String email){
+        return settingsService.sendResetOtp(email);
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<String> verifyResetOtp(@RequestBody ResetPasswordSendOtpRequest request){
+        return settingsService.verifyResetOtp(request.getEmail(), request.getOtp());
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPaswordRequest request){
+        return settingsService.ResetPassword(request.getEmail(), request.getNewPassword());
     }
 
 }
