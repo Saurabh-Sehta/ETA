@@ -38,24 +38,6 @@ public class EmailService {
         mailSender.send(message);
     }
 
-//    public void sendResetOtpEmail(String toEmail, String otp) {
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setFrom(fromEmail);
-//        message.setTo(toEmail);
-//        message.setSubject("Password Reset OTP");
-//        message.setText("Your OTP for reseting your password is " + otp + ". Use this OTP to proceed with resetting your password.");
-//        mailSender.send(message);
-//    }
-//
-//    public void sendOtpEmail(String toEmail, String otp){
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setFrom(fromEmail);
-//        message.setTo(toEmail);
-//        message.setSubject("Account verifiation OTP");
-//        message.setText("Your OTP is " + otp + ". Verify your account using this OTP.");
-//        mailSender.send(message);
-//    }
-
     public void sendOtpEmail(String toEmail, String otp) throws MessagingException {
         Context context = new Context();
         context.setVariable("name", "Sir/Mam");
@@ -78,7 +60,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("otp",otp);
-        context.setVariable("expiryMinutes", "15");
+        context.setVariable("expiryMinutes", "10");
 
         String process = templateEngine.process("password-reset-email", context);
         MimeMessage mimeMessage = mailSender.createMimeMessage();

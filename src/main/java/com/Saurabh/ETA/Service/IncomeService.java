@@ -6,8 +6,10 @@ import com.Saurabh.ETA.Io.Expense.DeleteResponse;
 import com.Saurabh.ETA.Io.Income.AddIncomeRequest;
 import com.Saurabh.ETA.Io.Income.AddIncomeResponse;
 import com.Saurabh.ETA.Repository.IncomeRepository;
+import com.Saurabh.ETA.Repository.SummaryRepository;
 import com.Saurabh.ETA.Repository.UsersRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +33,9 @@ public class IncomeService {
 
     private final IncomeRepository incomeRepository;
     private final UsersRepository usersRepository;
+    private final SummaryService summaryService;
 
+    @Transactional
     public ResponseEntity<AddIncomeResponse> addIncome(AddIncomeRequest request, String email) {
         UserEntity user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Unauthorized"));
@@ -42,6 +48,20 @@ public class IncomeService {
                     .date(request.getDate())
                     .build();
             incomeRepository.save(income);
+
+            LocalDate incomeDate = income.getDate();
+            YearMonth incomeMonth = YearMonth.from(incomeDate);
+            YearMonth currentMonth = YearMonth.now();
+
+            if (incomeMonth.isBefore(currentMonth)) {
+                summaryService.regenerateMonthlySummary(
+                        user,
+                        incomeMonth.getYear(),
+                        incomeMonth.getMonthValue()
+                );
+            } else {
+                summaryService.checkAndGenerateMonthlySummary(user);
+            }
             AddIncomeResponse response = convertToAddIncomeResponse(user.getId(), income);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -84,7 +104,22 @@ public class IncomeService {
                     .orElseThrow(() -> new UsernameNotFoundException("Not Authorized"));
             IncomeEntity income = incomeRepository.findByUserAndId(user, id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Income not found"));
+
+            LocalDate incomeDate = income.getDate();
+            YearMonth incomeMonth = YearMonth.from(incomeDate);
+            YearMonth currentMonth = YearMonth.now();
+
             incomeRepository.delete(income);
+
+            if (incomeMonth.isBefore(currentMonth)) {
+                summaryService.regenerateMonthlySummary(
+                        user,
+                        incomeMonth.getYear(),
+                        incomeMonth.getMonthValue()
+                );
+            } else {
+                summaryService.checkAndGenerateMonthlySummary(user);
+            }
             return new ResponseEntity<>(new DeleteResponse("Income deleted successfully"), HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

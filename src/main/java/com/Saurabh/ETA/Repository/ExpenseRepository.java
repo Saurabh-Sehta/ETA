@@ -18,17 +18,21 @@ public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
 
     void deleteByUserAndId(UserEntity user, Long id);
 
-    // ✅ total expense
+    // total expense
     @Query("SELECT COALESCE(SUM(e.amount), 0) FROM ExpenseEntity e WHERE e.user = :user")
     Double getTotalExpense(@Param("user") UserEntity user);
 
-    // ✅ last 30 days expenses
+    // last 30 days expenses
     List<ExpenseEntity> findByUserAndDateAfterOrderByDateDesc(
             UserEntity user,
             LocalDate date
     );
 
-    // ✅ recent expenses
+    // recent expenses
     List<ExpenseEntity> findTop5ByUserOrderByDateDesc(UserEntity user);
 
+    // Expenses in particular month
+    List<ExpenseEntity> findByUserAndDateBetween(UserEntity user, LocalDate start, LocalDate end);
+
+    void deleteByUserAndDateBefore(UserEntity user, LocalDate cutoff);
 }

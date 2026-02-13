@@ -1,6 +1,5 @@
 package com.Saurabh.ETA.Controller;
 
-import com.Saurabh.ETA.Entity.ExpenseEntity;
 import com.Saurabh.ETA.Io.Expense.AddExpenseRequest;
 import com.Saurabh.ETA.Io.Expense.AddExpenseResponse;
 import com.Saurabh.ETA.Io.Expense.DeleteResponse;

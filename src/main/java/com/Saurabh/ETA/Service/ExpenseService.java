@@ -6,8 +6,10 @@ import com.Saurabh.ETA.Io.Expense.AddExpenseRequest;
 import com.Saurabh.ETA.Io.Expense.AddExpenseResponse;
 import com.Saurabh.ETA.Io.Expense.DeleteResponse;
 import com.Saurabh.ETA.Repository.ExpenseRepository;
+import com.Saurabh.ETA.Repository.SummaryRepository;
 import com.Saurabh.ETA.Repository.UsersRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +33,9 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final UsersRepository usersRepository;
+    private final SummaryService summaryService;
 
+    @Transactional
     public ResponseEntity<AddExpenseResponse> addExpense(AddExpenseRequest request, String email) {
         UserEntity user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Unauthorized"));
@@ -42,6 +48,21 @@ public class ExpenseService {
                     .date(request.getDate())
                     .build();
             expenseRepository.save(expense);
+
+            LocalDate expenseDate = expense.getDate();
+            YearMonth expenseMonth = YearMonth.from(expenseDate);
+            YearMonth currentMonth = YearMonth.now();
+
+            if (expenseMonth.isBefore(currentMonth)) {
+                summaryService.regenerateMonthlySummary(
+                        user,
+                        expenseMonth.getYear(),
+                        expenseMonth.getMonthValue()
+                );
+            } else {
+                summaryService.checkAndGenerateMonthlySummary(user);
+            }
+
             AddExpenseResponse response = convertToAddExpenseResponse(user.getId(), expense);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -85,7 +106,23 @@ public class ExpenseService {
                     .orElseThrow(() -> new UsernameNotFoundException("Not Authorized"));
             ExpenseEntity expense = expenseRepository.findByUserAndId(user, id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Expense not found"));
+
+            LocalDate expenseDate = expense.getDate();
+            YearMonth expenseMonth = YearMonth.from(expenseDate);
+            YearMonth currentMonth = YearMonth.now();
+
             expenseRepository.delete(expense);
+
+            if (expenseMonth.isBefore(currentMonth)) {
+                summaryService.regenerateMonthlySummary(
+                        user,
+                        expenseMonth.getYear(),
+                        expenseMonth.getMonthValue()
+                );
+            } else {
+                summaryService.checkAndGenerateMonthlySummary(user);
+            }
+
             return new ResponseEntity<>(new DeleteResponse("Expense deleted successfully"), HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

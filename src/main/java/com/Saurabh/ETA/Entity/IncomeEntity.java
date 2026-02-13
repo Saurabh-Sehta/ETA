@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -46,11 +44,5 @@ public class IncomeEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @CreationTimestamp
-//    @Column(updatable = false)
-//    private Timestamp createdAt;
-//
-//    @UpdateTimestamp
-//    private Timestamp updatedAt;
 }
 

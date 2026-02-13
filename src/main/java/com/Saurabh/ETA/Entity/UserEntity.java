@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -43,11 +42,5 @@ public class UserEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @CreationTimestamp
-//    @Column(updatable = false)
-//    private Timestamp createdAt;
-//
-//    @UpdateTimestamp
-//    private Timestamp updatedAt;
 
 }

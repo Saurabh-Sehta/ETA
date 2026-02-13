@@ -16,16 +16,21 @@ public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
 
     Optional<IncomeEntity> findByUserAndId(UserEntity user, Long id);
 
-    // ✅ total income
+    // total income
     @Query("SELECT COALESCE(SUM(i.amount), 0) FROM IncomeEntity i WHERE i.user = :user")
     Double getTotalIncome(@Param("user") UserEntity user);
 
-    // ✅ last 60 days income transactions
+    // last 60 days income transactions
     List<IncomeEntity> findByUserAndDateAfterOrderByDateDesc(
             UserEntity user,
             LocalDate date
     );
 
-    // ✅ recent income
+    // recent income
     List<IncomeEntity> findTop5ByUserOrderByDateDesc(UserEntity user);
+
+    // Income sources in particular month
+    List<IncomeEntity> findByUserAndDateBetween(UserEntity user, LocalDate start, LocalDate end);
+
+    void deleteByUserAndDateBefore(UserEntity user, LocalDate cutoff);
 }
